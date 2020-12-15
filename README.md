@@ -4,7 +4,7 @@
 
 I made this quick babashka script in response to my inability to transform
 [jet](https://github.com/borkdude/jet) to support YAML. The `dotter` suffix is
-usually means to *daughter of* in Scandinavian culture, and `jetson` was
+usually means *daughter of* in Scandinavian culture, and `jetson` was
 already taken by another project.
 
 # Installation
