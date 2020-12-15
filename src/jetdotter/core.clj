@@ -28,10 +28,14 @@
   (keyword (last (str/split filename #"\."))))
 
 (defn convert-extension [filename source target]
-  (let [new-ext (if  (= target :transit) :transit.json target)
-        n-drop (if (= source :transit) 2 1)]
+  (let [filename-parts (str/split filename #"\.")
+        new-ext (if  (= target :transit) :transit.json target)
+        n-drop
+        (if (and (= source :transit)
+                 (= (last (butlast filename-parts)) "transit"))
+          2 1)]
     (str
-     (str/join "." (drop-last n-drop (str/split filename #"\.")))
+     (str/join "." (drop-last n-drop filename-parts ))
      "." (name new-ext))))
 
 (defn parse
