@@ -1,1 +1,0 @@
-{:source-paths ["src"], :dependencies [[camel-snake-kebab "0.4.0"] [cljs-bean "1.5.0"] [cljs-node-io "1.1.2"] [cider/cider-nrepl "0.25.0-SNAPSHOT"] [cider/piggieback "0.4.2"]], :builds {:app {:target :node-script, :main edn-yaml.core/main, :output-to "target/edn_yaml.js"}}}
