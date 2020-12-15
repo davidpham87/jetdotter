@@ -13,7 +13,8 @@
 (def data-format #{:json :yml :edn :yaml :transit})
 
 (def cli-opts
-  [["-f" "--from FROM" "Source Format. Only necessary for transit format."]
+  [["-f" "--from FROM" "Source Format. Only necessary for transit format."
+    :parse-fn keyword]
    ["-t" "--to TO" (format "Target Format. One of %s."
                            (str/join ", " (map name data-format)))
     :default :edn
@@ -26,9 +27,12 @@
 (defn extension [filename]
   (keyword (last (str/split filename #"\."))))
 
-(defn convert-extension [filename target]
-  (str (str/join "." (butlast (str/split filename #"\.")))
-       "." (name (case target :transit :transit.json target))))
+(defn convert-extension [filename source target]
+  (let [new-ext (if  (= target :transit) :transit.json target)
+        n-drop (if (= source :transit) 2 1)]
+    (str
+     (str/join "." (drop-last n-drop (str/split filename #"\.")))
+     "." (name new-ext))))
 
 (defn parse
   ([s type]
@@ -62,7 +66,7 @@
     (doseq [filename (get opts :arguments)]
       (let [source-format (or (get-in opts [:options :from]) (extension filename))
             target-format (get-in opts [:options :to])
-            output-filename (convert-extension filename target-format)]
+            output-filename (convert-extension filename source-format target-format)]
         (println (format "Converting %s to %s" filename output-filename))
         (-> (slurp filename)
             (parse source-format)
@@ -76,4 +80,8 @@
   (parse (generate {:a 3} :transit) :transit)
   (parse (generate {:a 3} :json) :json)
   (parse (generate {:a 3} :yaml) :yaml)
-  (parse (generate {:a 3} :edn) :edn))
+  (parse (generate {:a 3} :edn) :edn)
+  (def s "[\"^ \",\"~:a\",3,\"~:b\",[1,2,3,4],\"c\",\"~$a\",\"~:d/k\",[\"~#set\",[1,3,2]]]")
+  (t/read (t/reader (input-stream (.getBytes s "UTF-8")) :json))
+
+  )
