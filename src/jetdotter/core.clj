@@ -17,6 +17,7 @@
    ["-t" "--to TO" (format "Target Format. One of %s."
                            (str/join ", " (map name data-format)))
     :default :edn
+    :parse-fn keyword
     :validate [format]]
    ["-h" "--help" "Show this help"]])
 
@@ -50,17 +51,23 @@
 
 (defn -main [& args]
   (let [opts (parse-opts args cli-opts)]
-    (when (get-in opts [:arguments :help])
+    (when (get-in opts [:options :help])
       (println "Data to Data Conversion")
       (println (:summary opts)))
+    (println (:options opts))
+    (println (:arguments opts))
     (doseq [filename (get opts :arguments)]
       (let [source-format (or (get-in opts [:options :from]) (extension filename))
-            target-format (get-in opts [:options :target])
+            target-format (get-in opts [:options :to])
             output-filename (convert-extension filename target-format)]
         (-> (slurp filename)
             (parse source-format)
             (generate target-format)
-            (spit output-filename))))))
+            (as-> $ (spit output-filename $)))))))
+
+(when (= *file* (System/getProperty "babashka.file"))
+  (apply -main *command-line-args*))
+
 (comment
   (parse (generate {:a 3} :transit) :transit)
   (parse (generate {:a 3} :json) :json)
