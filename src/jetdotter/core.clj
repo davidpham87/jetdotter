@@ -62,6 +62,9 @@
      :edn (if pretty? (with-out-str (clojure.pprint/pprint data)) (str data))
      identity)))
 
+(defn convert [s from to]
+  (-> s (parse from) (generate to)))
+
 (defn -main [& args]
   (let [opts (parse-opts args cli-opts)]
     (when (get-in opts [:options :help])
